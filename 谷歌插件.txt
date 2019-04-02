@@ -1,0 +1,124 @@
+注册：
+右键菜单：contextMenus
+匹配图标："declarativeContent","activeTab"
+特定环境下开启："page_action":
+    {
+        "default_icon": "image/h1.jpg",
+        "default_title": "我是pageAction",
+        "default_popup": "popup.html"
+    },
+全局开启："browser_action": {
+          "default_icon": "image/h1.jpg",
+          "default_title": "神奇",
+          "default_popup": "popup.html"
+        },
+特定环境js：chrome.runtime.onInstalled.addListener(function(details) {
+        chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
+          chrome.declarativeContent.onPageChanged.addRules([
+        {
+              conditions: [
+                  // 只有打开百度才显示pageAction
+                  new chrome.declarativeContent.PageStateMatcher({pageUrl: {urlContains: 'baidu.com'}})
+              ],
+              actions: [new chrome.declarativeContent.ShowPageAction()]
+          }
+      ]);
+    });
+});
+右键百度搜索：chrome.contextMenus.create({
+    title: '使用百度搜索：%s', // %s表示选中的文字
+    contexts: ['selection'], // 只有当选中文字时才会出现此右键菜单
+    onclick: function(params)
+    {
+        // 注意不能使用location.href，因为location是属于background的window对象
+        chrome.tabs.create({url: 'https://www.baidu.com/s?ie=utf-8&wd=' + encodeURI(params.selectionText)});
+    }
+});
+{"permissions": ["contextMenus"， "tabs"]}
+chrome.contextMenus.create({
+    type: 'normal'， // 类型，可选：["normal", "checkbox", "radio", "separator"]，默认 normal
+    title: '菜单的名字', // 显示的文字，除非为“separator”类型否则此参数必需，如果类型为“selection”，可以使用%s显示选定的文本
+    contexts: ['page'], // 上下文环境，可选：["all", "page", "frame", "selection", "link", "editable", "image", "video", "audio"]，默认page
+    onclick: function(){}, // 单击时触发的方法
+    parentId: 1, // 右键菜单项的父菜单项ID。指定父菜单项将会使此菜单项成为父菜单项的子菜单
+    documentUrlPatterns: 'https://*.baidu.com/*' // 只在某些页面显示此右键菜单
+});
+// 删除某一个菜单项
+chrome.contextMenus.remove(menuItemId)；
+// 删除所有自定义右键菜单
+chrome.contextMenus.removeAll();
+// 更新某一个菜单项
+chrome.contextMenus.update(menuItemId, updateProperties);
+
+执行："document_start", "document_end", or "document_idle"，最后一个表示页面空闲时，默认document_idle
+            "run_at": "document_start"
+匹配地址content执行："matches": ["<all_urls>"],
+  "matches": ["http://*/*", "https://*/*"],
+             "<all_urls>" 表示匹配所有地址
+
+
+这里的injected-script是我给它取的，指的是通过DOM操作的方式向页面注入的一种JS。为什么要把这种JS单独拿出来讨论呢？又或者说为什么需要通过这种方式注入JS呢？
+
+这是因为content-script有一个很大的“缺陷”，也就是无法访问页面中的JS，虽然它可以操作DOM，但是DOM却不能调用它，也就是无法在DOM中通过绑定事件的方式调用content-script中的代码（包括直接写onclick和addEventListener2种方式都不行），但是，“在页面上添加一个按钮并调用插件的扩展API”是一个很常见的需求，那该怎么办呢？其实这就是本小节要讲的。
+
+在content-script中通过DOM方式向页面注入inject-script代码示例：
+
+
+// 普通页面能够直接访问的插件资源列表，如果不设置是无法直接访问的
+    "web_accessible_resources": ["js/inject.js"],
+
+
+
+
+
+
+图标上的文本：类似消息提示
+chrome.browserAction.setBadgeText({text: 'new'});
+chrome.browserAction.setBadgeBackgroundColor({color: [255, 0, 0, 255]});
+
+
+图标显示隐藏：
+chrome.pageAction.show(tabId) 显示图标；
+chrome.pageAction.hide(tabId) 隐藏图标；
+
+
+选项入口：
+{
+    "options_ui":
+    {
+        "page": "options.html",
+        // 添加一些默认的样式，推荐使用
+        "chrome_style": true
+    },
+}
+
+
+
+桌面通知：
+{notifications}
+chrome.notifications.create(null, {
+    type: 'basic',
+    iconUrl: 'img/icon.png',
+    title: '这是标题',
+    message: '您刚才点击了自定义右键菜单！'
+});
+
+
+
+五种类型js对比：
+JS种类		可访问的API		       DOM访问情况  JS访问情况	直接跨域
+injected script	和普通JS无任何差别，不能访问任何扩展API	可以访问	可以访问	不可以
+content script	只能访问 extension、runtime等部分API	可以访问	不可以	不可以
+popup js	可访问绝大部分API，除了devtools系列	不可直接访问	不可以	可以
+background js	可访问绝大部分API，除了devtools系列	不可直接访问	不可以	可以
+devtools js	只能访问 devtools、extension、runtime等部分API	可以	可以	不可以
+
+
+页面dom监听
+document.addEventListener('DOMContentLoaded', function()
+{
+    let html = $("html").html()
+    console.log(html)
+    console.log(location);
+});
+C:\Users\icpnt\Desktop\Plug-in unit.pem秘钥文件
