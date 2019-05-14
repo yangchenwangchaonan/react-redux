@@ -65,7 +65,7 @@
     "workbox-webpack-plugin": "3.6.3"
   },
   "scripts": {
-    "start": "node scripts/start.js",
+    "start": "set PORT=3002 && node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js"
   },
@@ -131,8 +131,8 @@
       [
         "import",
         {
-          "libraryName":"antd-mobile",
-          "style":"css"
+          "libraryName": "antd-mobile",
+          "style": "css"
         }
       ],
       [
