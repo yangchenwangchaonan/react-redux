@@ -10,7 +10,6 @@ const models = {
         'user':{type:String,require:true},
         'pwd':{type:String,require:true},
         'type':{type:String,require:true},
-        // 头像
         'avatar':{type:String},
         'desc':{type:String},
         'title':{type:String},

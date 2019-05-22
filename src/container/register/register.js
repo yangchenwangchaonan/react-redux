@@ -3,6 +3,7 @@ import Logo from "../../component/logo/logo"
 import {List,InputItem,Radio,WingBlank,WhiteSpace,Button} from "antd-mobile"
 import {register} from"../../redux/user.redux"
 import {connect} from "react-redux"
+import {Redirect} from 'react-router-dom'
 import "../../index.css"
 @connect(
     state=>state.user,
@@ -32,6 +33,7 @@ class Register extends React.Component{
         const RadioItem = Radio.RadioItem
         return(
             <div>
+                {this.props.redirectTo?<Redirect to={this.props.redirectTo}></Redirect>:null}
             <Logo/>
             <h1>注册</h1>
             <WingBlank>
@@ -49,10 +51,10 @@ class Register extends React.Component{
                                 >
                         牛人
                     </RadioItem> 
-                    <RadioItem onChange={()=>this.handleChange('type',"boos")} 
-                               checked={this.state.type=="boos"}
+                    <RadioItem onChange={()=>this.handleChange('type',"boss")}
+                               checked={this.state.type=="boss"}
                                >
-                        Boos
+                        Boss
                     </RadioItem>   
                 </List>
                 <WhiteSpace/>
